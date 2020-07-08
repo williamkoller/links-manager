@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+    mysql:
+        image: mysql:5.7
+        environment:
+            MYSQL_ROOT_USER: ${USER}
+            MYSQL_ROOT_PASSWORD: ${PASSWORD}
+            MYSQL_DATABASE: ${DATABASE}
+        ports:
+            - '3306:3306'
+        volumes:
+            - ./:/var/lib/mysql
+        networks:
+            - mysql-compose-network
+
+    adminer:
+        image: adminer
+        ports:
+            - 8080:8080
+        networks:
+            - mysql-compose-network
+    backend:
+        image: node:latest
+        container_name: backend
+        restart: always
+        env_file:
+            - .env
+        depends_on:
+            - mysql
+        ports:
+            - ${PORT}:${PORT}
+        volumes:
+            - .:/usr/src/app
+        working_dir: /usr/src/app
+        command: yarn dev
+        logging:
+            driver: 'json-file'
+            options:
+                max-size: '10m'
+                max-file: '5'
+
+networks:
+    mysql-compose-network:
+        driver: bridge
