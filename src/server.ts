@@ -1,11 +1,12 @@
 import express from 'express'
+import authController from './controllers/auth'
+import dotenv from 'dotenv'
 
+dotenv.config()
 const server = express()
 
-server.get('/', (request: express.Request, response: express.Response) => {
-	response.send({ message: 'API ok' })
-})
+server.use('/auth', authController)
 
-server.listen(3001, () => {
-	console.log(`Listening on port 3001`)
+server.listen(process.env.PORT, () => {
+	console.log(`Listening on port ${process.env.PORT}`)
 })
